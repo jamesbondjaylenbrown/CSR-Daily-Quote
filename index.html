@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lego Savings Planner</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header .logo { font-size: 3rem; margin-bottom: 10px; }
+
+    header h1 {
+      font-size: 1.9rem;
+      color: #1a1a2e;
+      font-weight: 800;
+    }
+
+    header p {
+      color: #666;
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 20px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 15px;
+      border: 2px solid #e8e8e8;
+      border-radius: 11px;
+      font-size: 1rem;
+      color: #1a1a2e;
+      background: #fafafa;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #e3000b;
+      background: #fff;
+    }
+
+    input::placeholder { color: #bbb; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: #e3000b;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    .btn:hover { background: #c5000a; }
+    .btn:active { transform: scale(0.98); }
+
+    .results {
+      display: none;
+    }
+
+    .results.visible { display: block; }
+
+    .set-banner {
+      background: linear-gradient(135deg, #fff8e1, #fff3cd);
+      border: 2px solid #ffcc00;
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .set-banner .set-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #999;
+      margin-bottom: 4px;
+    }
+
+    .set-banner .set-name {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+    }
+
+    .set-banner .set-price {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #e3000b;
+      line-height: 1;
+    }
+
+    .summary {
+      margin-bottom: 20px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid #f2f2f2;
+      font-size: 0.92rem;
+      color: #555;
+    }
+
+    .summary-row:last-child { border-bottom: none; }
+
+    .summary-row .val {
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .savings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .savings-item {
+      background: linear-gradient(140deg, #e3000b, #b50009);
+      border-radius: 14px;
+      padding: 18px 10px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .savings-item .period {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+
+    .savings-item .amount {
+      font-size: 1.35rem;
+      font-weight: 900;
+    }
+
+    .ready-banner {
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      border: 2px solid #66bb6a;
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #2e7d32;
+    }
+
+    .ready-banner .emoji { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 0.88rem;
+      color: #7a5900;
+      margin-top: 14px;
+    }
+
+    .reset-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #f0f0f0;
+      color: #555;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background 0.2s;
+    }
+
+    .reset-btn:hover { background: #e4e4e4; }
+
+    @media (max-width: 400px) {
+      .savings-grid { grid-template-columns: 1fr; }
+      .savings-item { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="logo">🧱</div>
+      <h1>Lego Savings Planner</h1>
+      <p>Plan how to save up for your next set</p>
+    </header>
+
+    <div class="card" id="inputCard">
+      <h2>Tell us about your goal</h2>
+
+      <div class="field">
+        <label for="setName">What set do you want?</label>
+        <input type="text" id="setName" placeholder="e.g. Eiffel Tower, Millennium Falcon" />
+      </div>
+
+      <div class="field">
+        <label for="price">How much does it cost? ($)</label>
+        <input type="number" id="price" placeholder="e.g. 249.99" min="0" step="0.01" />
+      </div>
+
+      <div class="field">
+        <label for="saved">How much have you already saved? ($)</label>
+        <input type="number" id="saved" placeholder="e.g. 50.00" min="0" step="0.01" value="0" />
+      </div>
+
+      <div class="field">
+        <label for="targetDate">When do you want to buy it?</label>
+        <input type="date" id="targetDate" />
+      </div>
+
+      <button class="btn" onclick="calculate()">Calculate My Savings Plan</button>
+    </div>
+
+    <div class="results" id="results">
+
+      <div class="set-banner">
+        <div class="set-label">Saving for</div>
+        <div class="set-name" id="rSetName"></div>
+        <div class="set-price" id="rPrice"></div>
+      </div>
+
+      <div class="card">
+        <div class="summary" id="summary">
+          <div class="summary-row">
+            <span>Already saved</span>
+            <span class="val" id="rSaved"></span>
+          </div>
+          <div class="summary-row">
+            <span>Still needed</span>
+            <span class="val" id="rNeeded"></span>
+          </div>
+          <div class="summary-row">
+            <span>Days to go</span>
+            <span class="val" id="rDays"></span>
+          </div>
+          <div class="summary-row">
+            <span>Target date</span>
+            <span class="val" id="rDate"></span>
+          </div>
+        </div>
+
+        <div id="savingsOutput"></div>
+
+        <div class="warning" id="warningMsg" style="display:none;"></div>
+
+        <button class="reset-btn" onclick="reset()">← Start over</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const defaultDate = new Date();
+    defaultDate.setMonth(defaultDate.getMonth() + 3);
+    document.getElementById('targetDate').value = defaultDate.toISOString().split('T')[0];
+    document.getElementById('targetDate').min = new Date().toISOString().split('T')[0];
+
+    function fmt(n) {
+      return '$' + n.toFixed(2);
+    }
+
+    function formatDate(dateStr) {
+      const [y, m, d] = dateStr.split('-');
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${months[parseInt(m) - 1]} ${parseInt(d)}, ${y}`;
+    }
+
+    function calculate() {
+      const setName = document.getElementById('setName').value.trim();
+      const price   = parseFloat(document.getElementById('price').value);
+      const saved   = parseFloat(document.getElementById('saved').value) || 0;
+      const dateStr = document.getElementById('targetDate').value;
+
+      if (!setName) { alert('Please enter the name of the Lego set.'); return; }
+      if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
+      if (!dateStr) { alert('Please choose a target date.'); return; }
+
+      const needed = Math.max(0, price - saved);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const target = new Date(dateStr + 'T00:00:00');
+      const days = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+
+      document.getElementById('rSetName').textContent = setName;
+      document.getElementById('rPrice').textContent = fmt(price);
+      document.getElementById('rSaved').textContent = fmt(saved);
+      document.getElementById('rNeeded').textContent = fmt(needed);
+      document.getElementById('rDays').textContent = days > 0 ? `${days} days` : 'Today or past';
+      document.getElementById('rDate').textContent = formatDate(dateStr);
+
+      const output = document.getElementById('savingsOutput');
+      const warning = document.getElementById('warningMsg');
+      warning.style.display = 'none';
+
+      if (needed === 0) {
+        output.innerHTML = `
+          <div class="ready-banner">
+            <span class="emoji">🎉</span>
+            You already have enough saved!<br>Go get that set!
+          </div>`;
+      } else if (days <= 0) {
+        output.innerHTML = '';
+        warning.textContent = '⚠️ Your target date is today or in the past. Update it to see your savings plan.';
+        warning.style.display = 'block';
+      } else {
+        const perDay   = needed / days;
+        const perWeek  = perDay * 7;
+        const perMonth = perDay * 30.44;
+
+        output.innerHTML = `
+          <div class="savings-grid">
+            <div class="savings-item">
+              <div class="period">Per Day</div>
+              <div class="amount">${fmt(perDay)}</div>
+            </div>
+            <div class="savings-item">
+              <div class="period">Per Week</div>
+              <div class="amount">${fmt(perWeek)}</div>
+            </div>
+            <div class="savings-item">
+              <div class="period">Per Month</div>
+              <div class="amount">${fmt(perMonth)}</div>
+            </div>
+          </div>`;
+      }
+
+      document.getElementById('inputCard').style.display = 'none';
+      document.getElementById('results').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function reset() {
+      document.getElementById('inputCard').style.display = 'block';
+      document.getElementById('results').classList.remove('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') calculate();
+    });
+  </script>
+</body>
+</html>
